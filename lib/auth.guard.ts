@@ -7,7 +7,6 @@ import {
   Optional,
   UnauthorizedException
 } from '@nestjs/common';
-import * as passport from 'passport';
 import { Type } from './interfaces';
 import {
   AuthModuleOptions,
@@ -53,7 +52,7 @@ function createAuthGuard(type?: string | string[]): Type<CanActivate> {
         type || this.options.defaultStrategy,
         options,
         (err, user, info, status) =>
-          this.handleRequest(err, user, info, context, status)
+          this.handleRequest(err, user, info, status)
       );
       request[options.property || defaultOptions.property] = user;
       return true;
@@ -72,7 +71,7 @@ function createAuthGuard(type?: string | string[]): Type<CanActivate> {
       );
     }
 
-    handleRequest(err, user, info, context, status): TUser {
+    handleRequest(err, user, info, status): TUser {
       if (err || !user) {
         throw err || new UnauthorizedException();
       }
@@ -89,18 +88,19 @@ function createAuthGuard(type?: string | string[]): Type<CanActivate> {
   return guard;
 }
 
-const createPassportContext = (request, response) => (
-  type,
-  options,
-  callback: Function
-) =>
-  new Promise((resolve, reject) =>
-    passport.authenticate(type, options, (err, user, info, status) => {
-      try {
-        request.authInfo = info;
-        return resolve(callback(err, user, info, status));
-      } catch (err) {
-        reject(err);
-      }
-    })(request, response, (err) => (err ? reject(err) : resolve()))
-  );
+const createPassportContext = (request, response) => async (type, options, callback) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      return await request.passport.authenticate(type, options, (request, response, err, user, info, status) => {
+        try {
+          request.authInfo = info;
+          return resolve(callback(err, user, info, status));
+        } catch (err) {
+          reject(err);
+        }
+      })(request, response);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
