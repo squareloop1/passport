@@ -1,5 +1,5 @@
 import {
-  DynamicModule, INestApplication,
+  DynamicModule,
   Module, OnModuleInit,
   Provider
 } from '@nestjs/common';
@@ -20,14 +20,11 @@ export class PassportModule implements OnModuleInit {
 
   async onModuleInit(): Promise<void> {
     if (this.options.useFastify && this.adapterHost.httpAdapter.getType() === 'fastify') {
-      await PassportModule.setupFastify(this.adapterHost.httpAdapter.getInstance());
+      const httpInstance = this.adapterHost.httpAdapter.getInstance();
+      await httpInstance.register(fastifySecureSession, { key: 'secretkeysecretkeysecretkeysecretkeysecretkeysecretkey' });
+      await httpInstance.register(passport.initialize());
+      await httpInstance.register(passport.secureSession());
     }
-  }
-
-  private static async setupFastify(httpInstance: any) {
-    await httpInstance.register(fastifySecureSession, { key: 'secretkeysecretkeysecretkeysecretkeysecretkeysecretkey' });
-    await httpInstance.register(passport.initialize());
-    await httpInstance.register(passport.secureSession());
   }
 
   static register(options: IAuthModuleOptions): DynamicModule {
