@@ -4,6 +4,7 @@ export interface IAuthModuleOptions<T = any> {
   defaultStrategy?: string | string[];
   session?: boolean;
   property?: string;
+  useFastify?: boolean;
   [key: string]: any;
 }
 
@@ -25,4 +26,5 @@ export class AuthModuleOptions implements IAuthModuleOptions {
   defaultStrategy?: string | string[];
   session?: boolean;
   property?: string;
+  useFastify?: boolean;
 }

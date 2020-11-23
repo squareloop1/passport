@@ -15,36 +15,20 @@ import { HttpAdapterHost } from '@nestjs/core';
 
 @Module({})
 export class PassportModule implements OnModuleInit {
-  constructor(private readonly adapterHost: HttpAdapterHost<any>) {}
+  constructor(private readonly options: AuthModuleOptions,
+              private readonly adapterHost: HttpAdapterHost<any>) {}
 
-  onModuleInit(): void {
-    // if (this.adapterHost.httpAdapter && this.adapterHost.httpAdapter.getType() === 'fastify') {
-    //   const fastify = this.adapterHost.httpAdapter.getInstance();
-    //   fastify.register((httpServer: any) => httpServer.register(fastifySecureSession, { key: 'secretkeysecretkeysecretkeysecretkeysecretkeysecretkey' }));
-    // }
-  }
-
-  public static registerFastifyPlugins(app: INestApplication): void {
-    const httpAdapter = app.getHttpAdapter();
-    if (httpAdapter && httpAdapter.getType() === 'fastify') {
-      this.setupFastify(app);
+  async onModuleInit(): Promise<void> {
+    if (this.options.useFastify && this.adapterHost.httpAdapter.getType() === 'fastify') {
+      await PassportModule.setupFastify(this.adapterHost.httpAdapter.getInstance());
     }
   }
 
-  private static setupFastify(httpInstance: any) {
-    httpInstance.register(async (httpServer: any) => httpServer.register(fastifySecureSession, { key: 'secretkeysecretkeysecretkeysecretkeysecretkeysecretkey' }));
-    httpInstance.register(async (httpServer: any) => httpServer.register(passport.initialize()));
-    httpInstance.register(async (httpServer: any) => httpServer.register(passport.secureSession()));
+  private static async setupFastify(httpInstance: any) {
+    await httpInstance.register(fastifySecureSession, { key: 'secretkeysecretkeysecretkeysecretkeysecretkeysecretkey' });
+    await httpInstance.register(passport.initialize());
+    await httpInstance.register(passport.secureSession());
   }
-
-  // public static registerFastifyPlugins(adapterHost: HttpAdapterHost): void {
-  //   if (adapterHost.httpAdapter && adapterHost.httpAdapter.getType() === 'fastify') {
-  //     const app = adapterHost.httpAdapter.getInstance() as FastifyInstance;
-  //     app.register(fastifySecureSession, { key: 'secretkeysecretkeysecretkeysecretkeysecretkeysecretkey' });
-  //     app.register(passport.initialize());
-  //     app.register(passport.secureSession());
-  //   }
-  // }
 
   static register(options: IAuthModuleOptions): DynamicModule {
     return {
