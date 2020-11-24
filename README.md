@@ -26,12 +26,14 @@
 
 ## Description
 
-[Passport](http://www.passportjs.org/) utilities module for [Nest](https://github.com/nestjs/nest).
+[Fastify-Passport](https://github.com/fastify/fastify-passport) utilities module for [Nest](https://github.com/nestjs/nest).
+
+⚠ PoC implementation of [fastify-passport](https://github.com/fastify/fastify-passport) for [NestJS](https://github.com/nestjs/nest) ⚠
 
 ## Installation
 
 ```bash
-$ npm i --save @nestjs/passport passport
+$ npm i --save https://github.com/squareloop1/passport.git
 ```
 
 ## Quick Start
