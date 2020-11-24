@@ -12,6 +12,8 @@ import {
 import fastifySecureSession from 'fastify-secure-session';
 import passport from 'fastify-passport';
 import { HttpAdapterHost } from '@nestjs/core';
+import { join } from 'path';
+import { readFileSync } from 'fs';
 
 @Module({})
 export class PassportModule implements OnModuleInit {
@@ -21,7 +23,7 @@ export class PassportModule implements OnModuleInit {
   async onModuleInit(): Promise<void> {
     if (this.options.useFastify && this.adapterHost.httpAdapter.getType() === 'fastify') {
       const httpInstance = this.adapterHost.httpAdapter.getInstance();
-      await httpInstance.register(fastifySecureSession, { key: 'secretkeysecretkeysecretkeysecretkeysecretkeysecretkey' });
+      await httpInstance.register(fastifySecureSession, { key: readFileSync(join(__dirname, 'secret-key')) });
       await httpInstance.register(passport.initialize());
       await httpInstance.register(passport.secureSession());
     }
